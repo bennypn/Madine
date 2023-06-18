@@ -1,0 +1,12 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.Madine" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your light theme here. -->
+        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+    </style>
+
+    <style name="Theme.Madine" parent="Base.Theme.Madine" />
+    <style name="EditTextHintColor" parent="Widget.AppCompat.EditText">
+    <item name="android:textColorHint">#5EBD96</item>
+</style>
+</resources>
