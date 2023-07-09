@@ -36,7 +36,7 @@ public class Simplify {
         ImageView imageViewIcon = layout.findViewById(R.id.imageViewIcon);
         imageViewIcon.setImageResource(R.drawable.baseline_info_25);
 
-        @SuppressLint({"MissingInflatedId", "LocalSuppress"}) TextView textViewMessage = layout.findViewById(R.id.message2);
+        TextView textViewMessage = layout.findViewById(R.id.message2);
         textViewMessage.setText(message);
 
         toast.setView(layout);

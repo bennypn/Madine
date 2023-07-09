@@ -28,6 +28,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -63,7 +64,6 @@ public class UserLogin extends AppCompatActivity {
             @Override
             public void onClick(View view)
             {
-                // Write a message to the database
                 loginUserAccount();
             }
         });
@@ -133,36 +133,22 @@ public class UserLogin extends AppCompatActivity {
             return;
         }
 
+        // show the visibility of progress bar to show loading
+        progressBar.setVisibility(View.VISIBLE);
 
+        // Write a message to the database
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        //fitur menampilkan nama pengguna
         DatabaseReference myRef = database.getReference("user").child(noUnit).child("email");
         myRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                // Ambil data dari dataSnapshot
-                // Misalnya, dapatkan nilai dari field tertentu
-                email = dataSnapshot.getValue(String.class);
+                if (dataSnapshot.exists()) {
+                    // Pengguna dengan ID yang cocok ditemukan
+                    String email = dataSnapshot.getValue(String.class);
+                    password = passwordTextView.getText().toString();
 
-                // Lakukan tindakan yang sesuai dengan data yang Anda dapatkan
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                // Tangani kesalahan jika ada
-            }
-        });
-        // show the visibility of progress bar to show loading
-        progressBar.setVisibility(View.VISIBLE);
-
-        // signin existing user
-        mAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(
-                        new OnCompleteListener<AuthResult>() {
-                            @Override
-                            public void onComplete(
-                                    @NonNull Task<AuthResult> task)
-                            {
+                    FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
+                            .addOnCompleteListener(task -> {
                                 if (task.isSuccessful()) {
                                     Simplify.showToastMessageWHITE(getApplicationContext(),"Login successful!!");
                                     // hide the progress bar
@@ -171,24 +157,32 @@ public class UserLogin extends AppCompatActivity {
                                     // if sign-in is successful
                                     // intent to home activity
                                     Intent intent;
-                                        intent = new Intent(UserLogin.this,
-                                                Monitoring.class);
+                                    intent = new Intent(UserLogin.this,
+                                            Monitoring.class);
                                     startActivity(intent);
-
-                                }
-
-                                else {
-
+                                    finish();
+                                } else {
                                     // sign-in failed
+                                    Exception exception = task.getException();
                                     Simplify.showToastMessageWHITE(getApplicationContext(),"Login failed!!");
                                     Simplify.showToastMessageWHITE(getApplicationContext(),email);
-                                    Simplify.showToastMessageWHITE(getApplicationContext(),password);
-
+//                                    Simplify.showToastMessageWHITE(getApplicationContext(),password);
+                                    Simplify.showToastMessageWHITE(getApplicationContext(),exception.getMessage());
                                     // hide the progress bar
                                     progressBar.setVisibility(View.GONE);
                                 }
-                            }
-                        });
-    }
+                            });
+                } else {
+                    Simplify.showToastMessageWHITE(getApplicationContext(),"Data tidak ditemukan");
+                    progressBar.setVisibility(View.GONE);
+                }
+            }
 
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Penanganan kesalahan
+            }
+        });
+
+    }
 }
