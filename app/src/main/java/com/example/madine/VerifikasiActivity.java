@@ -56,6 +56,7 @@ public class VerifikasiActivity extends AppCompatActivity {
     private static final int REQUEST_IMAGE_CAPTURE = 1;
     private static final int REQUEST_IMAGE_PICK = 2;
 
+    private static final int CAMERA_PERMISSION_REQUEST_CODE = 1;
     private ImageView imageView;
     private Uri imageUri;
     @Override
@@ -76,7 +77,7 @@ public class VerifikasiActivity extends AppCompatActivity {
         captureButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dispatchTakePictureIntent();
+                checkCameraPermission();
             }
         });
 
@@ -103,11 +104,40 @@ public class VerifikasiActivity extends AppCompatActivity {
 
     }
 
+    private void checkCameraPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+            // Jika izin kamera belum diberikan, munculkan dialog permintaan izin.
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.CAMERA},
+                    CAMERA_PERMISSION_REQUEST_CODE);
+        } else {
+            // Jika izin kamera sudah diberikan, langsung buka aktivitas kamera.
+            dispatchTakePictureIntent();
+        }
+    }
+
+    // Override metode onRequestPermissionsResult untuk menangani hasil permintaan izin.
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == CAMERA_PERMISSION_REQUEST_CODE) {
+            // Periksa apakah izin kamera telah diberikan oleh pengguna.
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Izin kamera diberikan, buka aktivitas kamera.
+                dispatchPickPictureIntent();
+            } else {
+                // Izin kamera ditolak, tangani sesuai kebutuhan aplikasi.
+                Toast.makeText(this, "Izin kamera ditolak.", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
     // Metode untuk memanggil intent kamera untuk mengambil gambar
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+            startActivityForResult(takePictureIntent, CAMERA_PERMISSION_REQUEST_CODE);
         }
     }
 

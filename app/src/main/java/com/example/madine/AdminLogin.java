@@ -109,7 +109,6 @@ public class AdminLogin extends AppCompatActivity {
 
         // Take the value of two edit texts in Strings
         user = usernameTextView.getText().toString();
-        user = "admin";
         email = user + "@gmail.com";
         password = passwordTextView.getText().toString();
         password = "123123";
@@ -147,13 +146,15 @@ public class AdminLogin extends AppCompatActivity {
                                     if(user.equals("admin")){
                                         intent = new Intent(AdminLogin.this,
                                                 MainAdmin.class);
+                                        startActivity(intent);
 
                                     }else{
-                                        intent = new Intent(AdminLogin.this,
-                                                MainActivity.class);
+                                        Simplify.showToastMessageWHITE(getApplicationContext(),"User Bukan Admin !");
+
+                                        // hide the progress bar
+                                        progressBar.setVisibility(View.GONE);
                                     }
 
-                                    startActivity(intent);
 
                                 }
 
