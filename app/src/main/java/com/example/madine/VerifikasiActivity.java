@@ -6,6 +6,7 @@ import static com.example.madine.MainActivity.noUnit;
 import static com.example.madine.MainActivity.password;
 import static com.example.madine.MainActivity.plat;
 import static com.example.madine.MainActivity.telpNo;
+import static com.example.madine.MainActivity.user;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -53,26 +54,31 @@ public class VerifikasiActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private Button registerButton;
     private FirebaseAuth mAuth;
+
+    private  DatabaseReference imgRef;
     private static final int REQUEST_IMAGE_CAPTURE = 1;
     private static final int REQUEST_IMAGE_PICK = 2;
 
     private static final int CAMERA_PERMISSION_REQUEST_CODE = 1;
     private ImageView imageView;
     private Uri imageUri;
+
+    private String imageUrl;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_verifikasi);
+
         // Inisialisasi komponen UI
         imageView = findViewById(R.id.imageView);
         Button captureButton = findViewById(R.id.captureButton);
         Button pickButton = findViewById(R.id.pickButton);
         progressBar = findViewById(R.id.progressBar2);
         registerButton = findViewById(R.id.btn_push_register);
-        mAuth = FirebaseAuth.getInstance();
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference usersRef = database.getReference("user");
 
+        //firebase init
+        mAuth = FirebaseAuth.getInstance();
+        imgRef = FirebaseDatabase.getInstance().getReference("img").child(user).child("imageUrl");
         /// Atur onClickListener untuk tombol Capture
         captureButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -89,7 +95,7 @@ public class VerifikasiActivity extends AppCompatActivity {
             }
         });
 
-        // Atur onClickListener untuk tombol Submit
+        // Atur onClickListener untuk tombol Register
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -98,12 +104,13 @@ public class VerifikasiActivity extends AppCompatActivity {
                     // show the visibility of progress bar to show loading
                     progressBar.setVisibility(View.VISIBLE);
                     uploadImageToStorage();
+                    imgRef.setValue(imageUrl);
                 }
             }
         });
-
     }
 
+    //region "Methods"
     private void checkCameraPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -201,7 +208,7 @@ public class VerifikasiActivity extends AppCompatActivity {
                         storageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                             @Override
                             public void onSuccess(Uri uri) {
-                                String imageUrl = uri.toString();
+                                imageUrl = uri.toString();
 
                                 // Simpan data pengguna ke Realtime Database beserta URL gambar
                                 saveUserDataToDatabase(imageUrl);
@@ -292,4 +299,5 @@ public class VerifikasiActivity extends AppCompatActivity {
                 });
     }
 
+    //endregion
 }
