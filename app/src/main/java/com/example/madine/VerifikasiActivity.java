@@ -78,7 +78,6 @@ public class VerifikasiActivity extends AppCompatActivity {
 
         //firebase init
         mAuth = FirebaseAuth.getInstance();
-        imgRef = FirebaseDatabase.getInstance().getReference("img").child(user).child("imageUrl");
         /// Atur onClickListener untuk tombol Capture
         captureButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -104,6 +103,7 @@ public class VerifikasiActivity extends AppCompatActivity {
                     // show the visibility of progress bar to show loading
                     progressBar.setVisibility(View.VISIBLE);
                     uploadImageToStorage();
+                    imgRef = FirebaseDatabase.getInstance().getReference("img").child(noUnit).child("imageUrl");
                     imgRef.setValue(imageUrl);
                 }
             }
@@ -196,7 +196,7 @@ public class VerifikasiActivity extends AppCompatActivity {
         }
 
         // Membuat referensi Firebase Storage dengan path yang unik
-        String imageFileName = "profile_image.jpg";
+        String imageFileName = user + ".jpg";
         StorageReference storageRef = FirebaseStorage.getInstance().getReference().child("images/" + imageFileName);
 
         // Mengunggah gambar ke Firebase Storage
